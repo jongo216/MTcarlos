@@ -1,5 +1,4 @@
 
-#include <vector>
 #include <stdio.h>
 
 #include "typedefs.h"
@@ -7,8 +6,6 @@
 #include "Camera.h"
 
 typedef Rectangle Wall;
-
-//std::vector<Object> objects;
 
 void setupScene(){
     printf("Setting up scene...\n");
@@ -21,7 +18,7 @@ void setupScene(){
     //objects.push_back(wBottom);
 
     //camera
-    Camera cam(WINDOW_WIDTH, WINDOW_HEIGHT, RAY_PER_PIXEL, Point(0.f, 250.f, 700.f, 1.f), 200.f, -Z_AXIS, Y_AXIS);
+    Camera cam(WINDOW_WIDTH, WINDOW_HEIGHT, Point(0.f, 250.f, 700.f, 1.f), 200.f, -Z_AXIS, Y_AXIS);
     printf("Rendering started...\n");
     cam.writePPM("test"/*, &objects*/);
 }

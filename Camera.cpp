@@ -5,8 +5,8 @@
 
 #include "Camera.h"
 
-Camera::Camera(const unsigned width, const unsigned height, unsigned rpp, Point pos, const float dist, Direction viewDir, Direction upDir)
-            : width_(width), height_(height), raysPerPixel_(rpp), position_(pos), distanceToImagePlane_(dist){
+Camera::Camera(const unsigned width, const unsigned height, Point pos, const float dist, Direction viewDir, Direction upDir)
+            : width_(width), height_(height), position_(pos), distanceToImagePlane_(dist){
 
     viewDirection_ = glm::normalize(viewDir);
     upDirection_ = glm::normalize(upDir);
@@ -23,11 +23,11 @@ Camera::Camera(const unsigned width, const unsigned height, unsigned rpp, Point 
     }
 }
 
-void Camera::writePPM(const std::string fileName/*, std::vector<Object> *obj*/){
+void Camera::writePPM(const std::string fileName){
     //do the raytracing
     int progress;
     for(unsigned i = 0; i < width_*height_; ++i){
-        pixels_[i].shootRays(/*obj*/);
+        pixels_[i].shootRays();
         //show progress in console
         progress = (float)i/(width_*height_-1)*100;
         if(progress % 5 == 0){

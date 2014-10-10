@@ -18,7 +18,6 @@ class Ray{
         void setImportance(const float imp){ importance_ = imp; };
 
         Color computeColor(){
-
             return color_;
         };
 
