@@ -19,7 +19,7 @@ Camera::Camera(const unsigned width, const unsigned height, Point pos, const flo
     //init pixels
     for(unsigned row = 0; row < width_; ++row){
         for(unsigned col = 0; col < height_; ++col){
-            pixels_[row*col].initRays(row, col, this);
+            pixels_[row*height_ + col].initRays(row, col, this);
         }
     }
 }
@@ -32,7 +32,7 @@ void Camera::writePPM(const std::string fileName, std::vector<Object*> *obj){
     for(unsigned i = 0; i < width_*height_; ++i){
         pixels_[i].shootRays(obj);
         //show progress in console
-        progress = (float)i/(width_*height_-1)*100;
+        progress = (float)i/*(row*height_ + col)*//(width_*height_-1)*100;
         if(progress % 5 == 0){
             std::cout << "\r" << progress << "% completed.";
             std::cout.flush();

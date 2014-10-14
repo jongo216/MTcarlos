@@ -4,13 +4,12 @@
 
 #include "typedefs.h"
 
-class Ray;
-
 class Object{
     public:
         Object(Point center, Color col) : centerPoint_(center), color_(col){};
-       //#include "Ray.h"
-        virtual Point calculateIntersection(Ray const *r){ return ORIGIN; };
+        virtual bool calculateIntersection(const Point &rayStart, const Direction rayDir, Point &intersect) = 0;
+
+        Color getColor(){ return color_; };
 
     protected:
         Point centerPoint_;

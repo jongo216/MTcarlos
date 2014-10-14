@@ -3,6 +3,7 @@
 #define __RAY_H__
 
 #include "typedefs.h"
+#include "Object.h"
 
 class Ray{
     public:
@@ -19,8 +20,18 @@ class Ray{
 
         Color computeColor(std::vector<Object*> *obj){
             //loop through the whole scene for each ray to determine intersection points
+            Point intersect;
+            float distance = 0.f;
             for(unsigned i = 0; i < obj->size(); ++i){
-                obj->at(i)->calculateIntersection(this);
+                 if(obj->at(i)->calculateIntersection(startPoint_, direction_, intersect)){
+                    //got an intersection
+                    /*float tmpDist = glm::length(startPoint_ - intersect);
+                    //find object intersection closest to the camera;
+                    if(distance == 0 || distance > ){
+                        distance = tmpDist;
+                    }*/
+                    return obj->at(i)->getColor();
+                }
             }
             return color_;
         };

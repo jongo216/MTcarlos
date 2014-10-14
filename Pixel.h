@@ -27,7 +27,6 @@ class Pixel{
                                                   normalizedRow * cam->rightDirection_
                                                 + normalizedCol * cam->upDirection_
                                                 +                 cam->viewDirection_));
-
             }
         };
 
@@ -43,7 +42,6 @@ class Pixel{
     protected:
         Ray *rays_;
         Color color_;
-        //const Camera *cam_;
 };
 
 #endif
