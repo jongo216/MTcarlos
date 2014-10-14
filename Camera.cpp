@@ -4,6 +4,7 @@
 #include <iomanip>
 
 #include "Camera.h"
+#include "Pixel.h"
 
 Camera::Camera(const unsigned width, const unsigned height, Point pos, const float dist, Direction viewDir, Direction upDir)
             : width_(width), height_(height), position_(pos), distanceToImagePlane_(dist){
@@ -23,11 +24,13 @@ Camera::Camera(const unsigned width, const unsigned height, Point pos, const flo
     }
 }
 
-void Camera::writePPM(const std::string fileName){
+Camera::~Camera(){ delete [] pixels_; };
+
+void Camera::writePPM(const std::string fileName, std::vector<Object*> *obj){
     //do the raytracing
     int progress;
     for(unsigned i = 0; i < width_*height_; ++i){
-        pixels_[i].shootRays();
+        pixels_[i].shootRays(obj);
         //show progress in console
         progress = (float)i/(width_*height_-1)*100;
         if(progress % 5 == 0){

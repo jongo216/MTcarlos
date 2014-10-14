@@ -17,7 +17,11 @@ class Ray{
         void setDirection(Direction dir){ direction_ = glm::normalize(dir); };
         void setImportance(const float imp){ importance_ = imp; };
 
-        Color computeColor(){
+        Color computeColor(std::vector<Object*> *obj){
+            //loop through the whole scene for each ray to determine intersection points
+            for(unsigned i = 0; i < obj->size(); ++i){
+                obj->at(i)->calculateIntersection(this);
+            }
             return color_;
         };
 

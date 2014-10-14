@@ -4,6 +4,7 @@
 
 #include "typedefs.h"
 #include "Object.h"
+#include "Ray.h"
 
 class Rectangle : public Object{
     public:
@@ -45,7 +46,7 @@ class Rectangle : public Object{
 
         };
 
-        virtual Point calculateIntersection(/*Ray r*/){
+        virtual Point calculateIntersection(Ray const *r){
             return ORIGIN;
         };
 

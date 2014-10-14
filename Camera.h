@@ -3,8 +3,13 @@
 #define __CAMERA_H__
 
 #include <string>
+#include <vector>
 
 #include "typedefs.h"
+#include "Object.h"
+
+//Pre-define class, include in cpp
+class Pixel;
 
 class Camera{
     friend class Pixel;
@@ -13,9 +18,9 @@ class Camera{
         Camera(const unsigned width, const unsigned height, Point pos, const float dist, Direction viewDir, Direction upDir);
 
         //destructor
-        ~Camera(){ delete [] pixels_; };
+        ~Camera();
 
-        void writePPM(const std::string fileName);
+        void writePPM(const std::string fileName, std::vector<Object*> *obj);
 
     protected:
         const unsigned width_;
@@ -27,8 +32,6 @@ class Camera{
 
         float distanceToImagePlane_;
 
-        //include here to avoid problems
-        #include "Pixel.h"
         Pixel *pixels_;
 };
 

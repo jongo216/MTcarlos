@@ -31,10 +31,10 @@ class Pixel{
             }
         };
 
-        void shootRays(){
+        void shootRays(std::vector<Object*> *obj){
             float averageWeight = 1.f/RAY_PER_PIXEL;
             for(unsigned i = 0; i < RAY_PER_PIXEL; ++i){
-                color_ += rays_[i].computeColor()*averageWeight;
+                color_ += rays_[i].computeColor(obj)*averageWeight;
             }
         };
 

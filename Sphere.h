@@ -4,7 +4,7 @@
 #include "typedefs.h"
 #include "Object.h"
 
-class Sphere : Object{
+class Sphere : public Object{
     public:
         Sphere();
         virtual Point CalculateIntersection();
