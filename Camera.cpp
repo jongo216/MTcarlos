@@ -13,13 +13,16 @@ Camera::Camera(const unsigned width, const unsigned height, Point pos, const flo
     upDirection_ = glm::normalize(upDir);
 
     rightDirection_ = glm::cross(viewDirection_,upDirection_);
+    std::cout << "camera right: " << rightDirection_[0] << " " << rightDirection_[1] << " " << rightDirection_[2] << std::endl;
     upDirection_ = glm::cross(rightDirection_, viewDirection_);
+    //upDirection_ = glm::cross(viewDirection_, rightDirection_);
+    std::cout << "camera up: " << upDirection_[0] << " " << upDirection_[1] << " " << upDirection_[2] << std::endl;
 
     pixels_ = new Pixel[width_*height_];
     //init pixels
     for(unsigned row = 0; row < width_; ++row){
         for(unsigned col = 0; col < height_; ++col){
-            pixels_[row*height_ + col].initRays(row, col, this);
+            pixels_[col*width_+ row].initRays(row, col, this);
         }
     }
 }
