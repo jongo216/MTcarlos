@@ -15,7 +15,7 @@ class Camera{
     friend class Pixel;
     public:
         //constructor
-        Camera(const unsigned width, const unsigned height, Point pos, const float dist, Direction viewDir, Direction upDir);
+        Camera(const unsigned width, const unsigned height, Pos4 pos, const float dist, Direction viewDir, Direction upDir);
 
         //destructor
         ~Camera();
@@ -25,7 +25,7 @@ class Camera{
     protected:
         const unsigned width_;
         const unsigned height_;
-        Point position_;
+        Pos4 position_;
         Direction viewDirection_;
         Direction upDirection_;
         Direction rightDirection_;

@@ -21,7 +21,7 @@ class Pixel{
             float normalizedCol = ((float)col/cam->height_) - 0.5 + 0.5f/cam->height_;
 
             for(unsigned i = 0; i < RAY_PER_PIXEL; ++i){
-                rays_[i].setStartPoint(cam->position_);
+                rays_[i].setStartPoint(Pos3(cam->position_));
                 rays_[i].setImportance(1.f/RAY_PER_PIXEL);
                 rays_[i].setDirection(glm::normalize(
                                                   normalizedRow * cam->rightDirection_

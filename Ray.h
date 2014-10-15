@@ -12,15 +12,15 @@ class Ray{
             childRays_      = NULL;
             numChilds_      = 0;
             insideObject_   = true;
-            color_          = RED;
+            color_          = BLACK;
         };
-        void setStartPoint(const Point start){ startPoint_ = start; };
+        void setStartPoint(const Pos3 start){ startPoint_ = start; };
         void setDirection(Direction dir){ direction_ = glm::normalize(dir); };
         void setImportance(const float imp){ importance_ = imp; };
 
         Color computeColor(std::vector<Object*> *obj){
             //loop through the whole scene for each ray to determine intersection points
-            Point intersect;
+            Pos3 intersect;
             float distance = 0.f;
             for(unsigned i = 0; i < obj->size(); ++i){
                  if(obj->at(i)->calculateIntersection(startPoint_, direction_, intersect)){
@@ -37,7 +37,7 @@ class Ray{
         };
 
     protected:
-        Point           startPoint_;
+        Pos3            startPoint_;
         Direction       direction_;
         float           importance_;
         Color           color_;         /* RGB vec3 */

@@ -4,7 +4,8 @@
 
 #include <glm/glm.hpp>
 
-typedef glm::vec4 Point;
+typedef glm::vec4 Pos4;
+typedef glm::vec3 Pos3;
 typedef glm::vec3 Direction;
 typedef glm::vec3 Color;        /*RGB*/
 

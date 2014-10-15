@@ -6,17 +6,16 @@
 #include "Camera.h"
 #include "Pixel.h"
 
-Camera::Camera(const unsigned width, const unsigned height, Point pos, const float dist, Direction viewDir, Direction upDir)
+Camera::Camera(const unsigned width, const unsigned height, Pos4 pos, const float dist, Direction viewDir, Direction upDir)
             : width_(width), height_(height), position_(pos), distanceToImagePlane_(dist){
 
     viewDirection_ = glm::normalize(viewDir);
     upDirection_ = glm::normalize(upDir);
 
     rightDirection_ = glm::cross(viewDirection_,upDirection_);
-    std::cout << "camera right: " << rightDirection_[0] << " " << rightDirection_[1] << " " << rightDirection_[2] << std::endl;
+    //std::cout << "camera right: " << rightDirection_[0] << " " << rightDirection_[1] << " " << rightDirection_[2] << std::endl;
     upDirection_ = glm::cross(rightDirection_, viewDirection_);
-    //upDirection_ = glm::cross(viewDirection_, rightDirection_);
-    std::cout << "camera up: " << upDirection_[0] << " " << upDirection_[1] << " " << upDirection_[2] << std::endl;
+    //std::cout << "camera up: " << upDirection_[0] << " " << upDirection_[1] << " " << upDirection_[2] << std::endl;
 
     pixels_ = new Pixel[width_*height_];
     //init pixels
@@ -35,7 +34,7 @@ void Camera::writePPM(const std::string fileName, std::vector<Object*> *obj){
     for(unsigned i = 0; i < width_*height_; ++i){
         pixels_[i].shootRays(obj);
         //show progress in console
-        progress = (float)i/*(row*height_ + col)*//(width_*height_-1)*100;
+        progress = (float)i/(width_*height_-1)*100;
         if(progress % 5 == 0){
             std::cout << "\r" << progress << "% completed.";
             std::cout.flush();
