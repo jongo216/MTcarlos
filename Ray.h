@@ -2,8 +2,14 @@
 #ifndef __RAY_H__
 #define __RAY_H__
 
+#include <algorithm>
+
 #include "typedefs.h"
 #include "Object.h"
+
+inline bool compareDistance(const std::pair<float, Color> &first, const std::pair<float, Color> &second){
+    return first.first < second.first;
+}
 
 class Ray{
     public:
@@ -21,22 +27,26 @@ class Ray{
         Color computeColor(std::vector<Object*> *obj){
             //loop through the whole scene for each ray to determine intersection points
             Pos3 intersect;
-            float distance = 0.f;
+            std::vector<std::pair<float, Color> > depthTest;
+            float distance;
+
             for(unsigned i = 0; i < obj->size(); ++i){
                  if(obj->at(i)->calculateIntersection(startPoint_, direction_, intersect)){
-                    //got an intersection
-                    /*float tmpDist = glm::length(startPoint_ - intersect);
-                    //find object intersection closest to the camera;
-                    if(distance == 0 || distance > ){
-                        distance = tmpDist;
-                    }*/
-                    return obj->at(i)->getColor();
+                    //got an intersection, save the intersection distance to the camera
+                    // and color to do depth test
+                    distance = glm::length(startPoint_ - intersect);
+                    //std::pair<float, Color> col(distance, obj->at(i)->getColor();
+                    depthTest.push_back( std::pair<float, Color>( distance, obj->at(i)->getColor() ) );
+                    //return obj->at(i)->getColor();
                 }
             }
+            std::sort(depthTest.begin(), depthTest.end(), compareDistance);
+            color_ = depthTest[0].second;
             return color_;
         };
 
     protected:
+        //variables
         Pos3            startPoint_;
         Direction       direction_;
         float           importance_;

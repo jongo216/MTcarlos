@@ -15,6 +15,7 @@ const glm::vec3 Z_AXIS(0.f, 0.f, 1.f);
 
 const glm::vec4 ORIGIN(0.f, 0.f, 0.f, 1.f);
 
+const glm::vec3 WHITE   (1.f, 1.f, 1.f);
 const glm::vec3 BLACK   (0.f, 0.f, 0.f);
 const glm::vec3 RED     (1.f, 0.f, 0.f);
 const glm::vec3 GREEN   (0.f, 1.f, 0.f);

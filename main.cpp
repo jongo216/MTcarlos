@@ -13,14 +13,15 @@ std::vector<Object*> objects;
 void setupScene(){
     printf("Setting up scene...\n");
     //walls
-    float width = 500.f;
+    float width  = 500.f;
     float height = 500.f;
+    float depth  = 400.f;
 
-    Wall    wTop    (X_AXIS*width, -Z_AXIS*height, Pos3(   0.f, 500.f,    0.f), BLUE),
-            wRight  (Z_AXIS*width,  Y_AXIS*height, Pos3( 250.f, 250.f,    0.f), GREEN),
-            wLeft   (Z_AXIS*width,  Y_AXIS*height, Pos3(-250.f, 250.f,    0.f), GREEN),
-            wBack   (X_AXIS*width,  Y_AXIS*height, Pos3(   0.f, 250.f, -250.f), RED),
-            wBottom (X_AXIS*width, -Z_AXIS*height, Pos3(   0.f,   0.f,    0.f), BLUE);
+    Wall    wTop    ( X_AXIS*width, -Z_AXIS*depth,  Pos3(     0.f,   height,      0.f), BLUE),
+            wRight  ( Z_AXIS*depth,  Y_AXIS*height, Pos3( width/2, height/2,      0.f), GREEN),
+            wLeft   (-Z_AXIS*depth,  Y_AXIS*height, Pos3(-width/2, height/2,      0.f), GREEN),
+            wBack   ( X_AXIS*width,  Y_AXIS*height, Pos3(     0.f, height/2, -depth/2), RED),
+            wBottom ( X_AXIS*width, -Z_AXIS*depth,  Pos3(     0.f,      0.f,      0.f), BLUE);
 
     objects.push_back(&wTop);
     objects.push_back(&wRight);
@@ -28,8 +29,11 @@ void setupScene(){
     objects.push_back(&wBack);
     objects.push_back(&wBottom);
 
+    Wall middle   ( X_AXIS*width,  Y_AXIS*height, Pos3(     0.f, height/2, 0.f), WHITE);
+    objects.push_back(&middle);
+
     //camera
-    Camera cam(WINDOW_WIDTH, WINDOW_HEIGHT, Pos4(0.f, 250.f, 700.f, 1.f), 200.f, -Z_AXIS, Y_AXIS);
+    Camera cam(WINDOW_WIDTH, WINDOW_HEIGHT, Pos4(0.f, height/2, 700.f, 1.f), 200.f, -Z_AXIS, Y_AXIS);
     printf("Rendering started...\n");
     cam.writePPM("test", &objects);
 }
