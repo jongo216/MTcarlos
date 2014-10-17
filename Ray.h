@@ -20,9 +20,9 @@ class Ray{
             insideObject_   = true;
             color_          = BLACK;
         };
-        void setStartPoint(const Pos3 start){ startPoint_ = start; };
-        void setDirection(Direction dir){ direction_ = glm::normalize(dir); };
-        void setImportance(const float imp){ importance_ = imp; };
+        inline void setStartPoint(const Pos3 start){ startPoint_ = start; };
+        inline void setDirection(Direction dir){ direction_ = glm::normalize(dir); };
+        inline void setImportance(const float imp){ importance_ = imp; };
 
         Color computeColor(std::vector<Object*> *obj){
             //loop through the whole scene for each ray to determine intersection points

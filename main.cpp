@@ -5,6 +5,7 @@
 #include "typedefs.h"
 #include "Rectangle.h"
 #include "Sphere.h"
+#include "Box.h"
 #include "Camera.h"
 
 typedef Rectangle Wall;
@@ -18,17 +19,17 @@ void setupScene(){
     float height = 500.f;
     float depth  = 400.f;
 
-    Wall    wTop    ( X_AXIS*width, -Z_AXIS*depth,  Pos3(     0.f,   height,      0.f), BLUE),
+    Wall    wTop    ( X_AXIS*width,  Z_AXIS*depth,  Pos3(     0.f,   height,      0.f), BLUE),
+            wBottom ( X_AXIS*width, -Z_AXIS*depth,  Pos3(     0.f,      0.f,      0.f), BLUE),
             wRight  ( Z_AXIS*depth,  Y_AXIS*height, Pos3( width/2, height/2,      0.f), GREEN),
             wLeft   (-Z_AXIS*depth,  Y_AXIS*height, Pos3(-width/2, height/2,      0.f), GREEN),
-            wBack   ( X_AXIS*width,  Y_AXIS*height, Pos3(     0.f, height/2, -depth/2), RED),
-            wBottom ( X_AXIS*width, -Z_AXIS*depth,  Pos3(     0.f,      0.f,      0.f), BLUE);
+            wBack   ( X_AXIS*width,  Y_AXIS*height, Pos3(     0.f, height/2, -depth/2), RED);
 
     objects.push_back(&wTop);
+    objects.push_back(&wBottom);
     objects.push_back(&wRight);
     objects.push_back(&wLeft);
     objects.push_back(&wBack);
-    objects.push_back(&wBottom);
 
     printf("Walls added...\n");
 
@@ -39,6 +40,8 @@ void setupScene(){
     objects.push_back(&sphere1);
     objects.push_back(&sphere2);
 
+    Box box1(150.f, 150.f, 150.f, Pos3(-200.f, 25.f, -100.f), Color(0.5f, 0.5f, 0.5f));
+    objects.push_back(&box1);
     printf("Other objects added...\n");
 
     //camera

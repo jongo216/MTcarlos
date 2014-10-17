@@ -6,6 +6,7 @@
 #include "Object.h"
 
 class Rectangle : public Object{
+    friend class Box;
     public:
         //constructor
         Rectangle(Direction right, Direction up, Pos3 centerPoint, Color col)
@@ -27,7 +28,7 @@ class Rectangle : public Object{
             if(dotDir == 0.0){
                 //ray is contained inside the plane
                 if(dotPoint == 0.0){
-                    return true;
+                    return false;
                 }
                 //ray parallel to plane and will never intersect
                 else
