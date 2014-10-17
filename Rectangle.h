@@ -19,7 +19,7 @@ class Rectangle : public Object{
             normal_ = glm::cross(wDir_, hDir_);
         };
 
-        virtual bool calculateIntersection(const Pos3 &rayStart, const Direction rayDir, Pos3 &intersect){
+        virtual bool calculateIntersection(const Pos3 &rayStart, const Direction &rayDir, Pos3 &intersect){
             //dl dot n + (l0-p0) dot n = 0
             float dotPoint  = glm::dot(centerPoint_-rayStart, normal_);
             float dotDir    = glm::dot(rayDir, normal_);

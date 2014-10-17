@@ -40,8 +40,10 @@ class Ray{
                     //return obj->at(i)->getColor();
                 }
             }
-            std::sort(depthTest.begin(), depthTest.end(), compareDistance);
-            color_ = depthTest[0].second;
+            if(!depthTest.empty()){
+                std::sort(depthTest.begin(), depthTest.end(), compareDistance);
+                color_ = depthTest[0].second;
+            }
             return color_;
         };
 

@@ -24,7 +24,7 @@ class Pixel{
                 rays_[i].setStartPoint(Pos3(cam->position_));
                 rays_[i].setImportance(1.f/RAY_PER_PIXEL);
                 rays_[i].setDirection(glm::normalize(
-                                                  normalizedRow * cam->rightDirection_
+                                                  normalizedRow * cam->rightDirection_*((float)cam->width_/cam->height_)
                                                 + normalizedCol *-cam->upDirection_     // minus notation due to center point transformation in image plane otherwise image is upside down
                                                 +                 cam->viewDirection_));
             }

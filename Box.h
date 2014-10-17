@@ -8,7 +8,7 @@
 class Box : Rectangle{
     public:
         Box();
-        virtual Point calculateIntersection();
+        virtual bool calculateIntersection(const Pos3 &rayStart, const Direction &rayDir, Pos3 &intersect);
 
     protected:
         Rectangle top_, bottom_, right_, left_, front_, back_;

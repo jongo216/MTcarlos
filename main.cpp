@@ -4,6 +4,7 @@
 
 #include "typedefs.h"
 #include "Rectangle.h"
+#include "Sphere.h"
 #include "Camera.h"
 
 typedef Rectangle Wall;
@@ -13,7 +14,7 @@ std::vector<Object*> objects;
 void setupScene(){
     printf("Setting up scene...\n");
     //walls
-    float width  = 500.f;
+    float width  = 700.f;
     float height = 500.f;
     float depth  = 400.f;
 
@@ -29,8 +30,16 @@ void setupScene(){
     objects.push_back(&wBack);
     objects.push_back(&wBottom);
 
-    Wall middle   ( X_AXIS*width,  Y_AXIS*height, Pos3(     0.f, height/2, 0.f), WHITE);
-    objects.push_back(&middle);
+    printf("Walls added...\n");
+
+
+    Sphere sphere1(Pos3(0.f, 100.f, 0.f), 100.f, WHITE);
+    Sphere sphere2(Pos3(50.f, 100.f, 0.f), 100.f, BLACK);
+
+    objects.push_back(&sphere1);
+    objects.push_back(&sphere2);
+
+    printf("Other objects added...\n");
 
     //camera
     Camera cam(WINDOW_WIDTH, WINDOW_HEIGHT, Pos4(0.f, height/2, 700.f, 1.f), 200.f, -Z_AXIS, Y_AXIS);
