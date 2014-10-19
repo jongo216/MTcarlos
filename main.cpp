@@ -36,12 +36,12 @@ void setupScene(){
 
 
     Sphere sphere1(Pos3( 0.f, 100.f, 0.f), 100.f, Material(true, WHITE));
-    Sphere sphere2(Pos3(50.f, 100.f, 0.f), 100.f, Material(true, GREEN+BLUE));
+    Sphere sphere2(Pos3(200.f, 100.f, 100.f), 100.f, Material(true, GREEN+BLUE));
 
     objects.push_back(&sphere1);
-    //objects.push_back(&sphere2);
+    objects.push_back(&sphere2);
 
-    Box box1(150.f, 150.f, 150.f, Pos3(-200.f, 25.f, -100.f), Material(true, Color(0.5f, 0.5f, 0.5f)));
+    Box box1(150.f, 150.f, 150.f, Pos3(-200.f, 75.f, -100.f), Material(true, Color(0.5f, 0.5f, 0.5f)));
     objects.push_back(&box1);
 
     printf("Other objects added...\n");
@@ -54,7 +54,7 @@ void setupScene(){
     printf("Light sources added...\n");
 
     //camera
-    Camera cam(WINDOW_WIDTH, WINDOW_HEIGHT, Pos4(0.f, height/2, 700.f, 1.f), 200.f, -Z_AXIS, Y_AXIS);
+    Camera cam(WINDOW_WIDTH, WINDOW_HEIGHT, Pos3(0.f, height/2, 700.f), 200.f, -Z_AXIS, Y_AXIS);
     printf("Rendering started...\n");
     cam.writePPM("test", objects, lights);
 }

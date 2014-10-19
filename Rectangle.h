@@ -6,6 +6,7 @@
 #include "Object.h"
 
 class Rectangle : public Object{
+    friend class Box;
     public:
         //constructor
         Rectangle(Direction right, Direction up, Pos3 centerPoint, Material mat)
@@ -19,7 +20,7 @@ class Rectangle : public Object{
             normal_ = glm::cross(wDir_, hDir_);
         };
 
-        virtual bool calculateIntersection(const Pos3 &rayStart, const Direction &rayDir, float &distanceAlongRay){
+        virtual bool calculateIntersection(const Pos3 &rayStart, const Direction &rayDir, float &distanceAlongRay, Direction *normal = NULL){
             //dl dot n + (l0-p0) dot n = 0
             float dotPoint  = glm::dot(centerPoint_-rayStart, normal_);
             float dotDir    = glm::dot(rayDir, normal_);
@@ -44,6 +45,8 @@ class Rectangle : public Object{
                     float rightComp = glm::dot(checkIntersect, wDir_);
                     float upComp = glm::dot(checkIntersect, hDir_);
                     if(std::abs(rightComp) <= width_/2 && std::abs(upComp) <= height_/2){
+                        if(normal)
+                            *normal = normal_;
                         return true;
                     }
                 }

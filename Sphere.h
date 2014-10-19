@@ -10,7 +10,7 @@ class Sphere : public Object{
             radiusSquared_ = radius_*radius_;   //use some more memory to save computations
         };
 
-        virtual bool calculateIntersection(const Pos3 &rayStart, const Direction &rayDir, float &distanceAlongRay){
+        virtual bool calculateIntersection(const Pos3 &rayStart, const Direction &rayDir, float &distanceAlongRay, Direction *normal = NULL){
             // d = -(l dot (o-c)) +- sqrt( (l dot (o-c))² - ||o-c|| -r²)
 
             // shortest distance between ray origin and center of sphere (o-c)
@@ -33,6 +33,9 @@ class Sphere : public Object{
             //second intersection on the back side related to the ray origin
             if(distanceAlongRay <= 0.f + ERROR_CORRECTION)
                 distanceAlongRay = cosTheta + squareRoot;
+
+            if(normal)
+                *normal = glm::normalize(rayStart + rayDir*distanceAlongRay - centerPoint_);
 
             return true;
         };

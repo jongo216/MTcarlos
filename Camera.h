@@ -15,17 +15,17 @@ class Camera{
     friend class Pixel;
     public:
         //constructor
-        Camera(const unsigned width, const unsigned height, Pos4 pos, const float dist, Direction viewDir, Direction upDir);
+        Camera(const unsigned width, const unsigned height, Pos3 pos, const float dist, Direction viewDir, Direction upDir);
 
         //destructor
         ~Camera();
 
-        void writePPM(const std::string fileName, std::vector<Object*> &obj, std::vector<Light*> &lights);
+        void writePPM(const std::string fileName, const std::vector<Object*> &obj, const std::vector<Light*> &lights);
 
     protected:
         const unsigned width_;
         const unsigned height_;
-        Pos4 position_;
+        Pos3 position_;
         Direction viewDirection_;
         Direction upDirection_;
         Direction rightDirection_;

@@ -6,7 +6,7 @@
 #include "Camera.h"
 #include "Pixel.h"
 
-Camera::Camera(const unsigned width, const unsigned height, Pos4 pos, const float dist, Direction viewDir, Direction upDir)
+Camera::Camera(const unsigned width, const unsigned height, Pos3 pos, const float dist, Direction viewDir, Direction upDir)
             : width_(width), height_(height), position_(pos), distanceToImagePlane_(dist){
 
     viewDirection_ = glm::normalize(viewDir);
@@ -28,11 +28,11 @@ Camera::Camera(const unsigned width, const unsigned height, Pos4 pos, const floa
 
 Camera::~Camera(){ delete [] pixels_; };
 
-void Camera::writePPM(const std::string fileName, std::vector<Object*> &obj, std::vector<Light*> &lights){
+void Camera::writePPM(const std::string fileName, const std::vector<Object*> &obj, const std::vector<Light*> &lights){
     //do the raytracing
     int progress;
     for(unsigned i = 0; i < width_*height_; ++i){
-        pixels_[i].shootRays(obj, lights);
+        pixels_[i].shootRays(position_, obj, lights);
         //show progress in console
         progress = (float)i/(width_*height_-1)*100;
         if(progress % 5 == 0){

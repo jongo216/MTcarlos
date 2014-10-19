@@ -7,7 +7,7 @@
 class Object{
     public:
         Object(Pos3 center, Material mat) : centerPoint_(center), material_(mat){};
-        virtual bool calculateIntersection(const Pos3 &rayStart, const Direction &rayDir, float &distanceAlongRay) = 0;
+        virtual bool calculateIntersection(const Pos3 &rayStart, const Direction &rayDir, float &distanceAlongRay, Direction *normal = NULL) = 0;
 
         inline Color getColor(){ return material_.color; };
 

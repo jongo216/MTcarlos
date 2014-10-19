@@ -30,10 +30,10 @@ class Pixel{
             }
         };
 
-        void shootRays(std::vector<Object*> &obj, std::vector<Light*> &lights){
+        void shootRays(const Pos3 &camPos, const std::vector<Object*> &obj, const std::vector<Light*> &lights){
             float averageWeight = 1.f/RAY_PER_PIXEL;
             for(unsigned i = 0; i < RAY_PER_PIXEL; ++i){
-                color_ += rays_[i].computeColor(obj, lights)*averageWeight;
+                color_ += rays_[i].computeColor(camPos, obj, lights)*averageWeight;
             }
         };
 

@@ -24,13 +24,15 @@ class Ray{
         inline void setDirection(Direction dir){ direction_ = glm::normalize(dir); };
         inline void setImportance(const float imp){ importance_ = imp; };
 
-        Color computeColor(std::vector<Object*> &obj, std::vector<Light*> &lights){
+        // The position of the camera is used to calculate view direction
+        Color computeColor(const Pos3 &camPos, const std::vector<Object*> &obj, const std::vector<Light*> &lights){
             //loop through the whole scene for each ray to determine intersection points
             float distanceAlongRay;
             std::vector<std::pair<float, Color> > depthTest;
+            Direction surfaceNormal;
 
             for(unsigned i = 0; i < obj.size(); ++i){
-                 if(obj[i]->calculateIntersection(startPoint_, direction_, distanceAlongRay)){
+                 if(obj[i]->calculateIntersection(startPoint_, direction_, distanceAlongRay, &surfaceNormal)){
                     //got an intersection, save the intersection distance to the camera
                     // and color to do depth test
 
@@ -56,20 +58,25 @@ class Ray{
                             return BLACK;
                     }
                 }
-                color_ = closestPoint.second*lights.front()->color;
+                //phong shading
+                //surfaceNormal;  // surface normal
+                //directionToLightsourceNormalized; // direction towards lightsource
+                Direction viewDirection = glm::normalize(intersectionPoint - camPos); // direction towards camera
+                Direction halfwayVector = glm::normalize(directionToLightsourceNormalized + viewDirection);
+                color_ = std::max(0.f, glm::dot(surfaceNormal, directionToLightsourceNormalized))*closestPoint.second*lights.front()->color;
             }
             return color_;
         };
 
     protected:
         //variables
-        Pos3            startPoint_;
+        Pos3            startPoint_;    // starting point of ray
         Direction       direction_;
         float           importance_;
-        Color           color_;         /* RGB vec3 */
+        Color           color_;         // RGB vec3
         Ray             *parentRay_;
         Ray             *childRays_;
-        unsigned char   numChilds_;     /* if = 0 the ray is finalNode */
+        unsigned char   numChilds_;     // if = 0 the ray is finalNode
         bool            insideObject_;
 };
 
