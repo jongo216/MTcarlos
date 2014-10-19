@@ -33,10 +33,8 @@ class Box : public Object{
             bool ret = false;
             for(unsigned i = 0; i < 6; ++i){
                 if(retSides[i]){
-                    //tmpLength = glm::length(intSect[i]-rayStart);
                     if(intSect[i] < length){
                         length = intSect[i];
-                        //intersect = intSect[i];
                         ret = true;
                     }
                 }

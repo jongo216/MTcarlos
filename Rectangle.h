@@ -36,16 +36,16 @@ class Rectangle : public Object{
             else{
                 //ray intersect plane somwhere, check boundarys of Rectangle
                 distanceAlongRay = dotPoint / dotDir;
-                if(distanceAlongRay < 0.f)
-                    return false;
 
-                Pos3 checkIntersect = (distanceAlongRay*rayDir + rayStart)-centerPoint_;       //center world coordinates to origin
+                if(distanceAlongRay > 0.f + ERROR_CORRECTION){
+                    Pos3 checkIntersect = (distanceAlongRay*rayDir + rayStart)-centerPoint_;       //center world coordinates to origin
 
-                // use vector projection to determine if intersection is inside rectangle
-                float rightComp = glm::dot(checkIntersect, wDir_);
-                float upComp = glm::dot(checkIntersect, hDir_);
-                if(std::abs(rightComp) <= width_/2 && std::abs(upComp) <= height_/2){
-                    return true;
+                    // use vector projection to determine if intersection is inside rectangle
+                    float rightComp = glm::dot(checkIntersect, wDir_);
+                    float upComp = glm::dot(checkIntersect, hDir_);
+                    if(std::abs(rightComp) <= width_/2 && std::abs(upComp) <= height_/2){
+                        return true;
+                    }
                 }
             }
 

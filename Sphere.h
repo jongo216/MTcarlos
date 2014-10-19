@@ -26,12 +26,13 @@ class Sphere : public Object{
             if( distCosThetaSquared > radiusSquared_)
                 return false;
 
-            //choose lowest d for intersection closest to camera.
-            distanceAlongRay = cosTheta - std::sqrt(radiusSquared_ - distCosThetaSquared);
-            if(distanceAlongRay < 0.f)
-                distanceAlongRay = cosTheta + std::sqrt(radiusSquared_ - distCosThetaSquared);
-            //d2 second intersection on the back side related to the camera
-            //float d2 = cosTheta + std::sqrt(radiusSquared_ - distCosThetaSquared);
+            //choose lowest d for intersection closest to ray origin.
+            float squareRoot = std::sqrt(radiusSquared_ - distCosThetaSquared);
+            distanceAlongRay = cosTheta - squareRoot;
+
+            //second intersection on the back side related to the ray origin
+            if(distanceAlongRay <= 0.f + ERROR_CORRECTION)
+                distanceAlongRay = cosTheta + squareRoot;
 
             return true;
         };

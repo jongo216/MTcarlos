@@ -7,7 +7,7 @@
 #include "typedefs.h"
 #include "Object.h"
 
-inline bool compareDistance(const std::pair<float, Pos4> &firstElem, const std::pair<float, Pos4> &secondElem){
+inline bool compareDistance(const std::pair<float, Color> &firstElem, const std::pair<float, Color> &secondElem){
     return firstElem.first < secondElem.first;
 }
 
@@ -27,16 +27,15 @@ class Ray{
         Color computeColor(std::vector<Object*> &obj, std::vector<Light*> &lights){
             //loop through the whole scene for each ray to determine intersection points
             float distanceAlongRay;
-            std::vector<std::pair<float, Pos4> > depthTest;
-            float distance;
+            std::vector<std::pair<float, Color> > depthTest;
 
             for(unsigned i = 0; i < obj.size(); ++i){
                  if(obj[i]->calculateIntersection(startPoint_, direction_, distanceAlongRay)){
                     //got an intersection, save the intersection distance to the camera
                     // and color to do depth test
 
-                    //store the distance as w coordinate in vec4
-                    depthTest.push_back( std::pair<float, Pos4>(distanceAlongRay, Pos4(obj[i]->getColor(), i) ) );
+                    //store the distance as and color
+                    depthTest.push_back( std::pair<float, Color>(distanceAlongRay, obj[i]->getColor() ) );
                 }
             }
 
@@ -45,21 +44,19 @@ class Ray{
                 std::sort(depthTest.begin(), depthTest.end(), compareDistance);
 
                 //calculate local lighting model by sending shadow ray towards lightstource hidden or not?
-                std::pair<float, Pos4> closestPoint = depthTest.front();
+                std::pair<float, Color> closestPoint = depthTest.front();
                 Pos3 intersectionPoint = startPoint_ + closestPoint.first*direction_;
                 Direction directionToLightsource = lights.front()->position - intersectionPoint;
                 Direction directionToLightsourceNormalized = glm::normalize(directionToLightsource);
 
                 for(unsigned i = 0; i < obj.size(); ++i){
-                    if(i != (unsigned)closestPoint.second[3]){
-                        if(obj[i]->calculateIntersection(intersectionPoint, directionToLightsourceNormalized, distanceAlongRay)){
-                            //determine if the intersection is between intersection point and light
-                            if(distanceAlongRay < glm::length(directionToLightsource) && distanceAlongRay > 0.f)
-                                return BLACK;
-                        }
+                    if(obj[i]->calculateIntersection(intersectionPoint, directionToLightsourceNormalized, distanceAlongRay)){
+                        //determine if the intersection is between intersection point and light
+                        if(distanceAlongRay < glm::length(directionToLightsource) && distanceAlongRay > 0.f + ERROR_CORRECTION)
+                            return BLACK;
                     }
                 }
-                color_ = Color(closestPoint.second)*lights.front()->color;
+                color_ = closestPoint.second*lights.front()->color;
             }
             return color_;
         };

@@ -21,6 +21,8 @@ const glm::vec3 RED     (1.f, 0.f, 0.f);
 const glm::vec3 GREEN   (0.f, 1.f, 0.f);
 const glm::vec3 BLUE    (0.f, 0.f, 1.f);
 
+const float ERROR_CORRECTION = 0.0001f;
+
 struct Material{
     bool diffuse;
     Color color;
