@@ -6,11 +6,10 @@
 #include "Object.h"
 
 class Rectangle : public Object{
-    friend class Box;
     public:
         //constructor
-        Rectangle(Direction right, Direction up, Pos3 centerPoint, Color col)
-        : Object(centerPoint, col){
+        Rectangle(Direction right, Direction up, Pos3 centerPoint, Material mat)
+        : Object(centerPoint, mat){
 
             width_ = glm::length(right);
             height_ = glm::length(up);
@@ -20,7 +19,7 @@ class Rectangle : public Object{
             normal_ = glm::cross(wDir_, hDir_);
         };
 
-        virtual bool calculateIntersection(const Pos3 &rayStart, const Direction &rayDir, Pos3 &intersect){
+        virtual bool calculateIntersection(const Pos3 &rayStart, const Direction &rayDir, float &distanceAlongRay){
             //dl dot n + (l0-p0) dot n = 0
             float dotPoint  = glm::dot(centerPoint_-rayStart, normal_);
             float dotDir    = glm::dot(rayDir, normal_);
@@ -36,10 +35,13 @@ class Rectangle : public Object{
             }
             else{
                 //ray intersect plane somwhere, check boundarys of Rectangle
-                float d =  dotPoint / dotDir;
-                intersect = d*rayDir + rayStart;                    //world coordinates
-                Pos3 checkIntersect = intersect-centerPoint_;       //center to origin
+                distanceAlongRay = dotPoint / dotDir;
+                if(distanceAlongRay < 0.f)
+                    return false;
 
+                Pos3 checkIntersect = (distanceAlongRay*rayDir + rayStart)-centerPoint_;       //center world coordinates to origin
+
+                // use vector projection to determine if intersection is inside rectangle
                 float rightComp = glm::dot(checkIntersect, wDir_);
                 float upComp = glm::dot(checkIntersect, hDir_);
                 if(std::abs(rightComp) <= width_/2 && std::abs(upComp) <= height_/2){

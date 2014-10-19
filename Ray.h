@@ -7,8 +7,8 @@
 #include "typedefs.h"
 #include "Object.h"
 
-inline bool compareDistance(const std::pair<float, Color> &first, const std::pair<float, Color> &second){
-    return first.first < second.first;
+inline bool compareDistance(const std::pair<float, Pos4> &firstElem, const std::pair<float, Pos4> &secondElem){
+    return firstElem.first < secondElem.first;
 }
 
 class Ray{
@@ -24,25 +24,42 @@ class Ray{
         inline void setDirection(Direction dir){ direction_ = glm::normalize(dir); };
         inline void setImportance(const float imp){ importance_ = imp; };
 
-        Color computeColor(std::vector<Object*> *obj){
+        Color computeColor(std::vector<Object*> &obj, std::vector<Light*> &lights){
             //loop through the whole scene for each ray to determine intersection points
-            Pos3 intersect;
-            std::vector<std::pair<float, Color> > depthTest;
+            float distanceAlongRay;
+            std::vector<std::pair<float, Pos4> > depthTest;
             float distance;
 
-            for(unsigned i = 0; i < obj->size(); ++i){
-                 if(obj->at(i)->calculateIntersection(startPoint_, direction_, intersect)){
+            for(unsigned i = 0; i < obj.size(); ++i){
+                 if(obj[i]->calculateIntersection(startPoint_, direction_, distanceAlongRay)){
                     //got an intersection, save the intersection distance to the camera
                     // and color to do depth test
-                    distance = glm::length(startPoint_ - intersect);
-                    //std::pair<float, Color> col(distance, obj->at(i)->getColor();
-                    depthTest.push_back( std::pair<float, Color>( distance, obj->at(i)->getColor() ) );
-                    //return obj->at(i)->getColor();
+
+                    //store the distance as w coordinate in vec4
+                    depthTest.push_back( std::pair<float, Pos4>(distanceAlongRay, Pos4(obj[i]->getColor(), i) ) );
                 }
             }
+
             if(!depthTest.empty()){
+                //sort intersections, we only care about the closest intersection
                 std::sort(depthTest.begin(), depthTest.end(), compareDistance);
-                color_ = depthTest[0].second;
+
+                //calculate local lighting model by sending shadow ray towards lightstource hidden or not?
+                std::pair<float, Pos4> closestPoint = depthTest.front();
+                Pos3 intersectionPoint = startPoint_ + closestPoint.first*direction_;
+                Direction directionToLightsource = lights.front()->position - intersectionPoint;
+                Direction directionToLightsourceNormalized = glm::normalize(directionToLightsource);
+
+                for(unsigned i = 0; i < obj.size(); ++i){
+                    if(i != (unsigned)closestPoint.second[3]){
+                        if(obj[i]->calculateIntersection(intersectionPoint, directionToLightsourceNormalized, distanceAlongRay)){
+                            //determine if the intersection is between intersection point and light
+                            if(distanceAlongRay < glm::length(directionToLightsource) && distanceAlongRay > 0.f)
+                                return BLACK;
+                        }
+                    }
+                }
+                color_ = Color(closestPoint.second)*lights.front()->color;
             }
             return color_;
         };

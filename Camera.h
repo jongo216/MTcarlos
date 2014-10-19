@@ -20,7 +20,7 @@ class Camera{
         //destructor
         ~Camera();
 
-        void writePPM(const std::string fileName, std::vector<Object*> *obj);
+        void writePPM(const std::string fileName, std::vector<Object*> &obj, std::vector<Light*> &lights);
 
     protected:
         const unsigned width_;

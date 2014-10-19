@@ -28,11 +28,11 @@ Camera::Camera(const unsigned width, const unsigned height, Pos4 pos, const floa
 
 Camera::~Camera(){ delete [] pixels_; };
 
-void Camera::writePPM(const std::string fileName, std::vector<Object*> *obj){
+void Camera::writePPM(const std::string fileName, std::vector<Object*> &obj, std::vector<Light*> &lights){
     //do the raytracing
     int progress;
     for(unsigned i = 0; i < width_*height_; ++i){
-        pixels_[i].shootRays(obj);
+        pixels_[i].shootRays(obj, lights);
         //show progress in console
         progress = (float)i/(width_*height_-1)*100;
         if(progress % 5 == 0){

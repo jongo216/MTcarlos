@@ -6,14 +6,14 @@
 
 class Object{
     public:
-        Object(Pos3 center, Color col) : centerPoint_(center), color_(col){};
-        virtual bool calculateIntersection(const Pos3 &rayStart, const Direction &rayDir, Pos3 &intersect) = 0;
+        Object(Pos3 center, Material mat) : centerPoint_(center), material_(mat){};
+        virtual bool calculateIntersection(const Pos3 &rayStart, const Direction &rayDir, float &distanceAlongRay) = 0;
 
-        inline Color getColor(){ return color_; };
+        inline Color getColor(){ return material_.color; };
 
     protected:
         Pos3 centerPoint_;
-        Color color_;
+        Material material_;
 };
 
 #endif

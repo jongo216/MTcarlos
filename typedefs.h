@@ -21,6 +21,18 @@ const glm::vec3 RED     (1.f, 0.f, 0.f);
 const glm::vec3 GREEN   (0.f, 1.f, 0.f);
 const glm::vec3 BLUE    (0.f, 0.f, 1.f);
 
+struct Material{
+    bool diffuse;
+    Color color;
+    Material(bool diff, Color col){ diffuse = diff; color = col; };
+};
+
+struct Light{
+    Pos3 position;
+    //pointlight
+    Color color;
+};
+
 //config variables
 #define RAY_PER_PIXEL 1
 #define RAY_MAX_BOUNCE 1

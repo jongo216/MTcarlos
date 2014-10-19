@@ -8,19 +8,19 @@
 
 class Box : public Object{
     public:
-        Box(float width, float height, float depth, Pos3 centerPoint, Color col)
-        : Object(centerPoint, col),
-        top_    (-X_AXIS*width,  Z_AXIS*depth,  centerPoint+Pos3(     0.f,  height/2,      0.f), color_),
-        bottom_ ( X_AXIS*width,  Z_AXIS*depth,  centerPoint+Pos3(     0.f, -height/2,      0.f), color_),
-        right_  (-Z_AXIS*depth,  Y_AXIS*height, centerPoint+Pos3( width/2,  height/2,      0.f), color_),
-        left_   ( Z_AXIS*depth,  Y_AXIS*height, centerPoint+Pos3(-width/2,  height/2,      0.f), color_),
-        front_  ( X_AXIS*width,  Y_AXIS*height, centerPoint+Pos3(     0.f,  height/2,  depth/2), color_),
-        back_   (-X_AXIS*width,  Y_AXIS*height, centerPoint+Pos3(     0.f,  height/2, -depth/2), color_)
+        Box(float width, float height, float depth, Pos3 centerPoint, Material mat)
+        : Object(centerPoint, mat),
+        top_    (-X_AXIS*width,  Z_AXIS*depth,  centerPoint+Pos3(     0.f,  height/2,      0.f), material_),
+        bottom_ ( X_AXIS*width,  Z_AXIS*depth,  centerPoint+Pos3(     0.f, -height/2,      0.f), material_),
+        right_  (-Z_AXIS*depth,  Y_AXIS*height, centerPoint+Pos3( width/2,  height/2,      0.f), material_),
+        left_   ( Z_AXIS*depth,  Y_AXIS*height, centerPoint+Pos3(-width/2,  height/2,      0.f), material_),
+        front_  ( X_AXIS*width,  Y_AXIS*height, centerPoint+Pos3(     0.f,  height/2,  depth/2), material_),
+        back_   (-X_AXIS*width,  Y_AXIS*height, centerPoint+Pos3(     0.f,  height/2, -depth/2), material_)
         {};
 
-        virtual bool calculateIntersection(const Pos3 &rayStart, const Direction &rayDir, Pos3 &intersect){
+        virtual bool calculateIntersection(const Pos3 &rayStart, const Direction &rayDir, float &distanceAlongRay){
             bool retSides[6];
-            Pos3 intSect[6];
+            float intSect[6];
             retSides[0] = top_.calculateIntersection(rayStart, rayDir, intSect[0]);
             retSides[1] = bottom_.calculateIntersection(rayStart, rayDir, intSect[1]);
             retSides[2] = right_.calculateIntersection(rayStart, rayDir, intSect[2]);
@@ -33,14 +33,15 @@ class Box : public Object{
             bool ret = false;
             for(unsigned i = 0; i < 6; ++i){
                 if(retSides[i]){
-                    tmpLength = glm::length(intSect[i]-rayStart);
-                    if(tmpLength < length){
-                        length = tmpLength;
-                        intersect = intSect[i];
+                    //tmpLength = glm::length(intSect[i]-rayStart);
+                    if(intSect[i] < length){
+                        length = intSect[i];
+                        //intersect = intSect[i];
                         ret = true;
                     }
                 }
             }
+            distanceAlongRay = length;
             return ret;
         };
 

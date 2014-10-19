@@ -6,11 +6,11 @@
 
 class Sphere : public Object{
     public:
-        Sphere(Pos3 centerPoint, float radius, Color col) : radius_(radius), Object(centerPoint, col){
+        Sphere(Pos3 centerPoint, float radius, Material mat) : radius_(radius), Object(centerPoint, mat){
             radiusSquared_ = radius_*radius_;   //use some more memory to save computations
         };
 
-        virtual bool calculateIntersection(const Pos3 &rayStart, const Direction &rayDir, Pos3 &intersect){
+        virtual bool calculateIntersection(const Pos3 &rayStart, const Direction &rayDir, float &distanceAlongRay){
             // d = -(l dot (o-c)) +- sqrt( (l dot (o-c))² - ||o-c|| -r²)
 
             // shortest distance between ray origin and center of sphere (o-c)
@@ -27,12 +27,12 @@ class Sphere : public Object{
                 return false;
 
             //choose lowest d for intersection closest to camera.
-            float d = cosTheta - std::sqrt(radiusSquared_ - distCosThetaSquared);
-
+            distanceAlongRay = cosTheta - std::sqrt(radiusSquared_ - distCosThetaSquared);
+            if(distanceAlongRay < 0.f)
+                distanceAlongRay = cosTheta + std::sqrt(radiusSquared_ - distCosThetaSquared);
             //d2 second intersection on the back side related to the camera
-            //float d2 = cosTheta - std::sqrt(radiusSquared_ - distCosThetaSquared);
+            //float d2 = cosTheta + std::sqrt(radiusSquared_ - distCosThetaSquared);
 
-            intersect = d*rayDir + rayStart;
             return true;
         };
 
