@@ -2,14 +2,12 @@
 #ifndef __RAY_H__
 #define __RAY_H__
 
-#include <algorithm>
+#include <vector>
 
 #include "typedefs.h"
 #include "Object.h"
 
-inline bool compareDistance(const std::pair<float, Color> &firstElem, const std::pair<float, Color> &secondElem){
-    return firstElem.first < secondElem.first;
-}
+typedef std::pair<Pos4, Material> distMatPair;
 
 class Ray{
     public:
@@ -25,50 +23,10 @@ class Ray{
         inline void setImportance(const float imp){ importance_ = imp; };
 
         // The position of the camera is used to calculate view direction
-        Color computeColor(const Pos3 &camPos, const std::vector<Object*> &obj, const std::vector<Light*> &lights){
-            //loop through the whole scene for each ray to determine intersection points
-            float distanceAlongRay;
-            std::vector<std::pair<float, Color> > depthTest;
-            Direction surfaceNormal;
-
-            for(unsigned i = 0; i < obj.size(); ++i){
-                 if(obj[i]->calculateIntersection(startPoint_, direction_, distanceAlongRay, &surfaceNormal)){
-                    //got an intersection, save the intersection distance to the camera
-                    // and color to do depth test
-
-                    //store the distance as and color
-                    depthTest.push_back( std::pair<float, Color>(distanceAlongRay, obj[i]->getColor() ) );
-                }
-            }
-
-            if(!depthTest.empty()){
-                //sort intersections, we only care about the closest intersection
-                std::sort(depthTest.begin(), depthTest.end(), compareDistance);
-
-                //calculate local lighting model by sending shadow ray towards lightstource hidden or not?
-                std::pair<float, Color> closestPoint = depthTest.front();
-                Pos3 intersectionPoint = startPoint_ + closestPoint.first*direction_;
-                Direction directionToLightsource = lights.front()->position - intersectionPoint;
-                Direction directionToLightsourceNormalized = glm::normalize(directionToLightsource);
-
-                for(unsigned i = 0; i < obj.size(); ++i){
-                    if(obj[i]->calculateIntersection(intersectionPoint, directionToLightsourceNormalized, distanceAlongRay)){
-                        //determine if the intersection is between intersection point and light
-                        if(distanceAlongRay < glm::length(directionToLightsource) && distanceAlongRay > 0.f + ERROR_CORRECTION)
-                            return BLACK;
-                    }
-                }
-                //phong shading
-                //surfaceNormal;  // surface normal
-                //directionToLightsourceNormalized; // direction towards lightsource
-                Direction viewDirection = glm::normalize(intersectionPoint - camPos); // direction towards camera
-                Direction halfwayVector = glm::normalize(directionToLightsourceNormalized + viewDirection);
-                color_ = std::max(0.f, glm::dot(surfaceNormal, directionToLightsourceNormalized))*closestPoint.second*lights.front()->color;
-            }
-            return color_;
-        };
+        Color computeColor(const Pos3 &camPos, const std::vector<Object*> &obj, const std::vector<Light*> &lights);
 
     protected:
+        Color computeLocalLighting(const Pos3 &camPos, const std::vector<Object*> &obj, const std::vector<Light*> &lights, const distMatPair &pointPair);
         //variables
         Pos3            startPoint_;    // starting point of ray
         Direction       direction_;

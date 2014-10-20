@@ -23,10 +23,12 @@ const glm::vec3 BLUE    (0.f, 0.f, 1.f);
 
 const float ERROR_CORRECTION = 0.0001f;
 
+enum MATERIAL_PROPS { LAMBERTIAN = 0, GLOSSY = 1, TRANSPARENT = 2 };
+
 struct Material{
-    bool diffuse;
+    int property;
     Color color;
-    Material(bool diff, Color col){ diffuse = diff; color = col; };
+    Material(int prop, Color col){ property = prop; color = col; };
 };
 
 struct Light{
