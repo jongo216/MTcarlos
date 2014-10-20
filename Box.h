@@ -33,7 +33,6 @@ class Box : public Object{
                 retSides[i] = sides_[i].calculateIntersection(rayStart, rayDir, dist[i]);
 
             float length = INFINITY;
-            float tmpLength;
             bool ret = false;
             for(unsigned i = 0; i < 6; ++i){
                 if(retSides[i]){

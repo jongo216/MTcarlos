@@ -11,13 +11,10 @@ typedef std::pair<Pos4, Material> distMatPair;
 
 class Ray{
     public:
-        Ray(){
-            parentRay_      = NULL;
-            childRays_      = NULL;
-            numChilds_      = 0;
-            insideObject_   = true;
-            color_          = BLACK;
-        };
+        Ray();
+        Ray(const Pos3 &start, const Direction &dir, float importance, bool inside, const Ray *parent);
+        ~Ray();
+
         inline void setStartPoint(const Pos3 start){ startPoint_ = start; };
         inline void setDirection(Direction dir){ direction_ = glm::normalize(dir); };
         inline void setImportance(const float imp){ importance_ = imp; };
@@ -32,7 +29,7 @@ class Ray{
         Direction       direction_;
         float           importance_;
         Color           color_;         // RGB vec3
-        Ray             *parentRay_;
+        const Ray       *parentRay_;
         Ray             *childRays_;
         unsigned char   numChilds_;     // if = 0 the ray is finalNode
         bool            insideObject_;

@@ -8,6 +8,28 @@ inline bool compareDistance(const distMatPair &firstElem, const distMatPair &sec
     return firstElem.first[3] < secondElem.first[3];
 };
 
+//default Constructor, called when initializing array
+Ray::Ray(){
+    parentRay_      = NULL;
+    childRays_      = NULL;
+    numChilds_      = 0;
+    insideObject_   = false;
+    color_          = BLACK;
+};
+
+Ray::Ray(const Pos3 &start, const Direction &dir, float importance, bool inside, const Ray *parent)
+        : startPoint_(start), direction_(dir), importance_(importance), insideObject_(inside){
+    parentRay_      = parent;
+    childRays_      = NULL;
+    numChilds_      = 0;
+    color_          = BLACK;
+};
+
+//destructor
+Ray::~Ray(){
+    delete childRays_;
+};
+
 Color Ray::computeColor(const Pos3 &camPos, const std::vector<Object*> &obj, const std::vector<Light*> &lights){
     // Loop through the scene for each ray to determine intersection points
     float distanceAlongRay;
@@ -21,13 +43,27 @@ Color Ray::computeColor(const Pos3 &camPos, const std::vector<Object*> &obj, con
 
 
     Color localLighting = BLACK;
+    Color newRayColor = BLACK;
     if(!depthTest.empty()){
         // sort intersections, we only care about the closest intersection
         std::sort(depthTest.begin(), depthTest.end(), compareDistance);
         // local lighting contribution
-        localLighting = computeLocalLighting(camPos, obj, lights, depthTest.front());
+        distMatPair closestIntersection = depthTest.front();
+        localLighting = computeLocalLighting(camPos, obj, lights, closestIntersection);
+
+        //launch reflected ray
+        if(!parentRay_ && closestIntersection.second.property != LAMBERTIAN){
+            ++numChilds_;
+            Pos3 newRayPos = startPoint_+closestIntersection.first[3]*direction_;
+            surfaceNormal = Direction(closestIntersection.first);
+            Direction newRayDir = glm::normalize(direction_ - 2.f*glm::dot(direction_, surfaceNormal)*surfaceNormal);
+            float newRayImportance = importance_*glm::dot(-direction_, surfaceNormal);
+            childRays_ = new Ray(newRayPos, newRayDir, newRayImportance, false, this);
+            newRayColor = childRays_->computeColor(camPos, obj, lights);
+        }
     }
-    return localLighting;
+
+    return importance_*(localLighting + newRayColor);
 };
 
 Color Ray::computeLocalLighting(const Pos3 &camPos, const std::vector<Object*> &obj, const std::vector<Light*> &lights, const distMatPair &pointPair){
@@ -45,7 +81,7 @@ Color Ray::computeLocalLighting(const Pos3 &camPos, const std::vector<Object*> &
             if(distanceAlongShadowRay < lengthToLightsource && distanceAlongShadowRay > 0.f + ERROR_CORRECTION)// && obj[i]->getMaterial().property != TRANSPARENT) //shadow rays pass through transparant objects
                 return BLACK;
 
-    //phong shading
+    // Blinn-Phong shading
     Direction normal(pointPair.first);  // surface normal
     //directionToLightsourceNormalized; // direction towards lightsource
     Direction viewDirection = glm::normalize(camPos - intersectionPoint); // direction towards camera
@@ -53,7 +89,7 @@ Color Ray::computeLocalLighting(const Pos3 &camPos, const std::vector<Object*> &
 
     float intensity = std::max(0.f, glm::dot(normal, directionToLightsourceNormalized)); // diffuse component
     if(pointPair.second.property != LAMBERTIAN)
-        intensity += std::pow( glm::dot(normal, halfwayVector), 100); // specular component
+        intensity += std::pow( glm::dot(normal, halfwayVector), ALPHA); // specular component
 
     return intensity*pointPair.second.color*lights.front()->color;
 };

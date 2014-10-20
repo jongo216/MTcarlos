@@ -6,7 +6,8 @@
 
 class Sphere : public Object{
     public:
-        Sphere(Pos3 centerPoint, float radius, Material mat) : radius_(radius), Object(centerPoint, mat){
+        Sphere(Pos3 centerPoint, float radius, Material mat) : Object(centerPoint, mat){
+            radius_ = radius;
             radiusSquared_ = radius_*radius_;   //use some more memory to save computations
         };
 

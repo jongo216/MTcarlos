@@ -23,7 +23,7 @@ const glm::vec3 BLUE    (0.f, 0.f, 1.f);
 
 const float ERROR_CORRECTION = 0.0001f;
 
-enum MATERIAL_PROPS { LAMBERTIAN = 0, GLOSSY = 1, TRANSPARENT = 2 };
+enum MATERIAL_PROPS { LAMBERTIAN, GLOSSY, TRANSPARENT };
 
 struct Material{
     int property;
@@ -43,5 +43,7 @@ struct Light{
 
 #define WINDOW_WIDTH  800
 #define WINDOW_HEIGHT 600
+
+#define ALPHA 100
 
 #endif
