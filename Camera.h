@@ -7,6 +7,7 @@
 
 #include "typedefs.h"
 #include "Object.h"
+#include "Light.h"
 
 //Pre-define class, include in cpp
 class Pixel;

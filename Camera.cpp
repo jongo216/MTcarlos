@@ -2,6 +2,7 @@
 #include <fstream>
 #include <iostream>
 #include <iomanip>
+#include <omp.h>
 
 #include "Camera.h"
 #include "Pixel.h"
@@ -30,17 +31,24 @@ Camera::~Camera(){ delete [] pixels_; };
 
 void Camera::writePPM(const std::string fileName, const std::vector<Object*> &obj, const std::vector<Light*> &lights){
     //do the raytracing
-    int progress;
+    int progress, done = 0.f;
+    //unsigned i;
+    //#pragma omp parallel private(i) shared(progress, done, std::cout, obj, lights)
+    {
+    #pragma omp parallel for
     for(unsigned i = 0; i < width_*height_; ++i){
         pixels_[i].shootRays(position_, obj, lights);
         //show progress in console
-        progress = (float)i/(width_*height_-1)*100;
+        progress = (float)++done/(width_*height_-1)*100;
         if(progress % 5 == 0){
-            std::cout << "\r" << progress << "% completed.";
-            std::cout.flush();
+            #pragma omp critical
+            {
+                std::cout << "\r" << progress << "% completed.";
+                std::cout.flush();
+            }
         }
     }
-
+    }
     Color color;
     // Save result to a PPM image (keep these flags if you compile under Windows)
     std::ofstream ofs((fileName + ".ppm").c_str(), std::ofstream::out | std::ofstream::binary);

@@ -2,6 +2,8 @@
 #ifndef __RECTANGLE_H__
 #define __RECTANGLE_H__
 
+#include <stdlib.h>
+
 #include "typedefs.h"
 #include "Object.h"
 
@@ -27,9 +29,8 @@ class Rectangle : public Object{
 
             if(dotDir == 0.0){
                 //ray is contained inside the plane
-                if(dotPoint == 0.0){
+                if(dotPoint == 0.0)
                     return false;
-                }
                 //ray parallel to plane and will never intersect
                 else
                     return false;
@@ -51,8 +52,14 @@ class Rectangle : public Object{
                     }
                 }
             }
-
             return false;
+        };
+
+        Pos3 getRandomPoint(){
+            float rx = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);   //random between 0 and 1
+            float ry = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+
+            return Pos3(rx*wDir_*width_ + ry*hDir_*height_);
         };
 
     protected:

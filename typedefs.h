@@ -27,23 +27,32 @@ enum MATERIAL_PROPS { LAMBERTIAN, GLOSSY, TRANSPARENT };
 
 struct Material{
     int property;
+    float Ks, Kd;
     Color color;
-    Material(int prop, Color col){ property = prop; color = col; };
-};
-
-struct Light{
-    Pos3 position;
-    //pointlight
-    Color color;
+    Material(int prop, Color col){
+        property = prop;
+        color = col;
+        Kd = 1.f;
+        if(property != LAMBERTIAN){
+            Ks = 1.0f;
+            Kd = 1.0f;
+        }
+        else{
+            Ks = 0.0f;
+            Kd = 0.8f;
+        }
+    };
 };
 
 //config variables
-#define RAY_PER_PIXEL 1
-#define RAY_MAX_BOUNCE 1
+#define RAY_PER_PIXEL 50
+#define RAY_MAX_BOUNCE 10
 
 #define WINDOW_WIDTH  800
 #define WINDOW_HEIGHT 600
 
 #define ALPHA 100
+#define AIR_INDEX 1.0
+#define GLASS_INDEX 1.5
 
 #endif
