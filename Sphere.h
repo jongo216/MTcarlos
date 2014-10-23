@@ -32,7 +32,7 @@ class Sphere : public Object{
             distanceAlongRay = cosTheta - squareRoot;
 
             //second intersection on the back side related to the ray origin
-            if(distanceAlongRay <= 0.f + ERROR_CORRECTION)
+            if(distanceAlongRay <= 0.f + 10.f*ERROR_CORRECTION)
                 distanceAlongRay = cosTheta + squareRoot;
 
             if(normal)

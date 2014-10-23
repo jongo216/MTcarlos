@@ -23,7 +23,7 @@ const glm::vec3 BLUE    (0.f, 0.f, 1.f);
 
 const float ERROR_CORRECTION = 0.0001f;
 
-enum MATERIAL_PROPS { LAMBERTIAN, GLOSSY, TRANSPARENT };
+enum MATERIAL_PROPS { LAMBERTIAN, GLOSSY, TRANSPARENT, EMISSIVE };
 
 struct Material{
     int property;
@@ -45,8 +45,9 @@ struct Material{
 };
 
 //config variables
-#define RAY_PER_PIXEL 50
+#define RAY_PER_PIXEL 20
 #define RAY_MAX_BOUNCE 10
+#define NO_SHADOW_RAYS 10
 
 #define WINDOW_WIDTH  800
 #define WINDOW_HEIGHT 600

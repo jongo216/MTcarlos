@@ -56,11 +56,13 @@ class Rectangle : public Object{
         };
 
         Pos3 getRandomPoint(){
-            float rx = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);   //random between 0 and 1
-            float ry = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+            float rx = static_cast <float> (rand()) / static_cast <float> (RAND_MAX) - 0.5f;   //random between 0 and 1
+            float ry = static_cast <float> (rand()) / static_cast <float> (RAND_MAX) - 0.5f;   //shift -0.5 to compensate for origin in center
 
-            return Pos3(rx*wDir_*width_ + ry*hDir_*height_);
+            return Pos3(rx*wDir_*(width_/2) + ry*hDir_*(height_/2) + centerPoint_);
         };
+
+        inline Direction getNormal(){ return normal_; };
 
     protected:
         Direction normal_;
