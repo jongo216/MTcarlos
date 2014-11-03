@@ -10,16 +10,9 @@ inline bool compareDistance(const distMatPair &firstElem, const distMatPair &sec
 
 //default Constructor, called when initializing array
 Ray::Ray(){
-    parentRay_      = NULL;
-    childRays_      = NULL;
-    numChilds_      = 0;
     insideObject_   = false;
     color_          = BLACK;
-};
-
-//destructor
-Ray::~Ray(){
-    delete [] childRays_;
+    russianP_       = 1.f;
 };
 
 Color Ray::computeColor(const Pos3 &camPos, const std::vector<Object*> &obj, const std::vector<Light*> &lights, unsigned iteration){
@@ -41,30 +34,37 @@ Color Ray::computeColor(const Pos3 &camPos, const std::vector<Object*> &obj, con
     if(!depthTest.empty()){
         // sort intersections, we only care about the closest intersection
         std::sort(depthTest.begin(), depthTest.end(), compareDistance);
-        // local lighting contribution
         distMatPair closestIntersection = depthTest.front();
 
-        //launch reflected ray
-        if(iteration <= RAY_MAX_BOUNCE){ // && closestIntersection.second.property != LAMBERTIAN){
+        if(russianRoulette(closestIntersection.second) ){ /* keep this for whitted ray tracing */ // iteration <= RAY_MAX_BOUNCE){
 
             surfaceNormal = Direction(closestIntersection.first);
-            Direction directionToLightsource;
 
             switch(closestIntersection.second.property){
                 case LAMBERTIAN:
-                    localLighting = computeLocalLighting(camPos, obj, lights, closestIntersection);
+                {
+                    float childImportance = 0.f;
+                    if(NO_MT_CARLO_RAYS != 0){
+                        Ray reflectedRay = computeReflectionRay(surfaceNormal, lights, closestIntersection);
+                        childImportance = reflectedRay.importance_/2.f;
+                        if(childImportance > 0.f)
+                            reflectedRayColor = childImportance*reflectedRay.computeColor(camPos, obj, lights, ++iteration);
+                    }
+                    localLighting = (1.f-childImportance)*computeLocalLighting(camPos, obj, lights, closestIntersection);
                     break;
+                }
 
                 case GLOSSY:
-                    childRays_ = new Ray[1];
-                    ++numChilds_;
-                    //initialize reflection ray
-                    computeReflectionRay(surfaceNormal, lights, closestIntersection);
-                    reflectedRayColor = /*childRays_[0].importance_**/childRays_[0].computeColor(camPos, obj, lights, ++iteration);
-                    //localLighting = computeLocalLighting(camPos, obj, lights, closestIntersection);
+                {
+                    Ray reflectedRay = computeReflectionRay(surfaceNormal, lights, closestIntersection);
+                    reflectedRayColor = reflectedRay.computeColor(camPos, obj, lights, ++iteration);
                     break;
+                }
 
                 case TRANSPARENT:
+                {
+                    Ray refractedRay;
+                    bool refraction = false;
                     if(insideObject_){
                         //alpha testing, if ray can be transmitted to air again
                         float alpha = std::acos(glm::dot(surfaceNormal, direction_));       //want positive angle
@@ -72,52 +72,36 @@ Color Ray::computeColor(const Pos3 &camPos, const std::vector<Object*> &obj, con
                         float alphaMax = std::asin(AIR_INDEX/GLASS_INDEX);
 
                         if(alpha < alphaMax){
-                            childRays_ = new Ray[2];
-                            ++numChilds_;
-                            //initialize refraction ray
-                            computeRefractionRay(surfaceNormal, closestIntersection);
-                        } else
-                            childRays_ = new Ray[1];
+                            refractedRay = computeRefractionRay(surfaceNormal, closestIntersection);
+                            refraction = true;
+                        }
                     }
                     else{
-                        childRays_ = new Ray[2];
-                        ++numChilds_;
-                        computeRefractionRay(surfaceNormal, closestIntersection);
+                        refractedRay = computeRefractionRay(surfaceNormal, closestIntersection);
+                        refraction = true;
                     }
-                    ++numChilds_;
-                    //initialize reflection ray
-                    computeReflectionRay(surfaceNormal, lights, closestIntersection);
+                    Ray reflectedRay = computeReflectionRay(surfaceNormal, lights, closestIntersection);
                     //if frefraction ray, compensate importance
-                    if(numChilds_ == 2){
-                        childRays_[0].setImportance(1.f - childRays_[1].importance_);
-                        refractedRayColor = childRays_[1].computeColor(camPos, obj, lights, ++iteration);
+                    if(refraction){
+                        reflectedRay.setImportance(1.f - refractedRay.importance_);
+                        refractedRayColor = refractedRay.computeColor(camPos, obj, lights, ++iteration);
                     }
-if(!insideObject_)
-                    reflectedRayColor = childRays_[0].computeColor(camPos, obj, lights, ++iteration);
-else
-                    reflectedRayColor = childRays_[0].computeColor(camPos, obj, lights, ++iteration);
+
+                    reflectedRayColor = reflectedRay.computeColor(camPos, obj, lights, ++iteration);
                     break;
+                }
 
                 case EMISSIVE:
+                {
                     localLighting = lights.front()->getColor();
                     break;
+                }
             }
-        }
+        } else
+            localLighting = computeLocalLighting(camPos, obj, lights, closestIntersection);
     }
 
-    //check if reflected ray is carying any color, otherwise discard the ray (only local lighting model)
-    float dImportance = 1.f;
-    /*if(glm::dot(reflectedRayColor,reflectedRayColor) > ERROR_CORRECTION*ERROR_CORRECTION && numChilds_ > 0) //use dot instead of length to avoid using sqrt
-        dImportance = 1.f - childRays_[0].importance_;
-
-    if(glm::dot(refractedRayColor,refractedRayColor) > ERROR_CORRECTION*ERROR_CORRECTION && numChilds_ > 1) //use dot instead of length to avoid using sqrt
-        dImportance -= childRays_[1].importance_;*/
-
-    //if(glm::dot(refractedRayColor,refractedRayColor) > ERROR_CORRECTION*ERROR_CORRECTION) //use dot instead of length to avoid using sqrt
-      //  dImportance -= refractedRayImportance;
-    //if(refractedRayImportance > 0.f)
-        //dImportance = 0.f;
-    return importance_*(localLighting + reflectedRayColor + refractedRayColor);
+    return importance_*(localLighting + reflectedRayColor + refractedRayColor)/russianP_;
 };
 
 Color Ray::computeLocalLighting(const Pos3 &camPos, const std::vector<Object*> &obj, const std::vector<Light*> &lights, const distMatPair &pointPair){
@@ -153,35 +137,30 @@ Color Ray::computeLocalLighting(const Pos3 &camPos, const std::vector<Object*> &
         // Blinn-Phong shading
         if(!discard){
             Direction halfwayVector = glm::normalize(dirToLightNormalized + viewDirection);
-            float intensity = pointPair.second.Kd * std::max(0.f, glm::dot(normal, dirToLightNormalized))   // diffuse component
-                            + pointPair.second.Ks * std::pow( glm::dot(normal, halfwayVector), ALPHA);       // specular component
+            float intensity = pointPair.second.Kd * std::max(0.f, glm::dot(normal, dirToLightNormalized))           // diffuse component
+                            + pointPair.second.Ks * std::pow( glm::dot(normal, halfwayVector), pointPair.second.specularAlpha);     // specular component
             returnColor += intensity*pointPair.second.color*lights.front()->getColor();
         }
     }
     return returnColor/(float)numberOfShadowRays;
 };
 
-void Ray::computeReflectionRay(const Direction &normal, const std::vector<Light*> &lights, const distMatPair &pointPair){
+Ray Ray::computeReflectionRay(const Direction &normal, const std::vector<Light*> &lights, const distMatPair &pointPair){
     Pos3        reflectedRayPos = startPoint_+(pointPair.first[3]+ERROR_CORRECTION) * direction_;
-    Direction   reflectedRayDir = glm::normalize(direction_ - 2.f*glm::dot(direction_, normal)*normal);
-//#include<stdio.h>
-//    if(insideObject_)
-//    printf("%f %f\n", glm::length(reflectedRayPos - Pos3(0.f, 100.f, 0.f)), pointPair.first[3]);
+    Direction   perfectReflection = direction_ - 2.f*glm::dot(direction_, normal)*normal;
 
-    //Direction   dirToLight      = glm::normalize(lights.front()->getPosition() - reflectedRayPos);
+    Ray ret;
+    ret.setStartPoint(reflectedRayPos);
+    ret.setImportance( computeBRDF(normal, pointPair, perfectReflection) );
+    ret.setDirection(glm::normalize(perfectReflection));
+    ret.setInsideObject(insideObject_);
+    ret.setRussianP(russianP_);
 
-    float BRDF = 1.f;//pointPair.second.Ks * std::pow( glm::dot(dirToLight, reflectedRayDir ), ALPHA) + pointPair.second.Kd;
-    float reflectedRayImportance = BRDF;//*glm::dot(-direction_, normal);//importance_*glm::dot(-direction_, normal);
-
-    childRays_[0].setStartPoint(reflectedRayPos);
-    childRays_[0].setDirection(reflectedRayDir);
-    childRays_[0].setImportance(reflectedRayImportance);
-    childRays_[0].setInsideObject(insideObject_);
-    childRays_[0].setParent(this);
+    return ret;
 };
 
 
-void Ray::computeRefractionRay(const Direction &normal, const distMatPair &pointPair){
+Ray Ray::computeRefractionRay(const Direction &normal, const distMatPair &pointPair){
     float n1 = insideObject_ ? GLASS_INDEX : AIR_INDEX;
     float n2 = insideObject_ ? AIR_INDEX : GLASS_INDEX;
     float refractiveIndex = n1/n2;
@@ -194,9 +173,65 @@ void Ray::computeRefractionRay(const Direction &normal, const distMatPair &point
 
     float refractedRayImportance = (4.f*n1*n2) / ((n1+n2)*(n1+n2)); //approximate computation
 
-    childRays_[1].setStartPoint(refractedRayPos);
-    childRays_[1].setDirection(refractedRayDir);
-    childRays_[1].setImportance(refractedRayImportance);
-    childRays_[1].setInsideObject(!insideObject_);
-    childRays_[1].setParent(this);
+    Ray ret;
+    ret.setStartPoint(refractedRayPos);
+    ret.setDirection(refractedRayDir);
+    ret.setImportance(refractedRayImportance);
+    ret.setInsideObject(!insideObject_);
+    ret.setRussianP(russianP_);
+
+    return ret;
+};
+
+float Ray::computeBRDF(const Direction &normal, const distMatPair &pointPair, Direction &reflection){
+    if(pointPair.second.property == LAMBERTIAN){
+        Direction perfectReflection = reflection;
+        //random numbers for azimuth and inclination angle
+
+        //inclination θ, azimuth φ
+        // u1 = θ, u2 φ
+        float u1 = 0.f, u2 = 0.f;     //random numbers
+        Direction psi(0.f);
+        for(unsigned i = 0; i < NO_MT_CARLO_RAYS; ++i){
+            u1 += static_cast <float> (rand()) / static_cast <float> (RAND_MAX+1);
+            u2 += static_cast <float> (rand()) / static_cast <float> (RAND_MAX+1);
+
+            //psi with respect to Z axis
+            Direction zRefl(std::sqrt(1.f-u1)*std::cos(2*M_PI*u2),
+                            std::sqrt(1.f-u1)*std::sin(2*M_PI*u2),
+                            std::sqrt(1.f-u1)
+                           );
+
+            //rotate accordingly to normal
+            Direction t = normal;
+
+            unsigned pos = 0;
+            float m = t[pos]*t[pos];
+            for(unsigned j = 1; j < 3; ++j){
+                if(m > t[j]*t[j]){
+                    m = t[j]*t[j];
+                    pos = j;
+                }
+            }
+            t[pos] = 1.f;
+
+            Direction u = glm::normalize(glm::cross(t, normal));
+            Direction v =               (glm::cross(normal, u));
+            glm::mat3 rot(u, v, normal);
+            reflection = (rot*zRefl);
+        }
+        return std::min(1.f, (pointPair.second.specularAlpha+2.f)/(2.f*NO_MT_CARLO_RAYS) * std::pow(glm::dot(perfectReflection, reflection), pointPair.second.specularAlpha));
+    }
+    return 1.f;
+};
+
+bool Ray::russianRoulette(const Material &m){
+    float randomDraw = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+    float alpha = 0.8f/m.specularAlpha;     //absorption probability
+    russianP_ *= (1.f-alpha);
+
+    if(randomDraw < russianP_)
+        return true;
+
+    return false;
 };

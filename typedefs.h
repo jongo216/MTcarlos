@@ -27,32 +27,34 @@ enum MATERIAL_PROPS { LAMBERTIAN, GLOSSY, TRANSPARENT, EMISSIVE };
 
 struct Material{
     int property;
-    float Ks, Kd;
+    float Ks, Kd, specularAlpha;
     Color color;
     Material(int prop, Color col){
         property = prop;
         color = col;
-        Kd = 1.f;
-        if(property != LAMBERTIAN){
-            Ks = 1.0f;
-            Kd = 1.0f;
-        }
-        else{
+
+        if(prop == LAMBERTIAN){
             Ks = 0.0f;
             Kd = 0.8f;
+            specularAlpha = 10.f;
+        }
+        else{
+            Ks = 1.0f;
+            Kd = 1.0f;
+            specularAlpha = 100.f;
         }
     };
 };
 
 //config variables
-#define RAY_PER_PIXEL 20
+#define RAY_PER_PIXEL 100
 #define RAY_MAX_BOUNCE 10
 #define NO_SHADOW_RAYS 10
+#define NO_MT_CARLO_RAYS 1
 
 #define WINDOW_WIDTH  800
 #define WINDOW_HEIGHT 600
 
-#define ALPHA 100
 #define AIR_INDEX 1.0
 #define GLASS_INDEX 1.5
 
