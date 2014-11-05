@@ -15,13 +15,11 @@ const glm::vec3 Z_AXIS(0.f, 0.f, 1.f);
 
 const glm::vec3 ORIGIN(0.f, 0.f, 0.f);
 
-const glm::vec3 WHITE   (1.f, 1.f, 1.f);
-const glm::vec3 BLACK   (0.f, 0.f, 0.f);
-const glm::vec3 RED     (1.f, 0.f, 0.f);
-const glm::vec3 GREEN   (0.f, 1.f, 0.f);
-const glm::vec3 BLUE    (0.f, 0.f, 1.f);
-
-const float ERROR_CORRECTION = 0.0001f;
+const glm::vec3 WHITE (1.f, 1.f, 1.f);
+const glm::vec3 BLACK (0.f, 0.f, 0.f);
+const glm::vec3 RED   (1.f, 0.f, 0.f);
+const glm::vec3 GREEN (0.f, 1.f, 0.f);
+const glm::vec3 BLUE  (0.f, 0.f, 1.f);
 
 enum MATERIAL_PROPS { LAMBERTIAN, GLOSSY, TRANSPARENT, EMISSIVE };
 
@@ -36,7 +34,7 @@ struct Material{
         if(prop == LAMBERTIAN){
             Ks = 0.0f;
             Kd = 0.8f;
-            specularAlpha = 10.f;
+            specularAlpha = 2.f;
         }
         else{
             Ks = 1.0f;
@@ -47,15 +45,18 @@ struct Material{
 };
 
 //config variables
-#define RAY_PER_PIXEL 100
-#define RAY_MAX_BOUNCE 10
+#define RAY_PER_PIXEL 40
+#define RAY_MAX_BOUNCE 10       //for whitted raytracing
 #define NO_SHADOW_RAYS 10
-#define NO_MT_CARLO_RAYS 1
+#define NO_MT_CARLO_RAYS 3
+#define COLOR_BLEED 0.7f
 
 #define WINDOW_WIDTH  800
 #define WINDOW_HEIGHT 600
 
-#define AIR_INDEX 1.0
-#define GLASS_INDEX 1.5
+#define AIR_INDEX 1.0f
+#define GLASS_INDEX 1.5f
+
+#define ERROR_CORRECTION 0.0001f
 
 #endif

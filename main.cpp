@@ -1,5 +1,7 @@
 
 #include <vector>
+#include <cstdlib>
+#include <ctime>
 #include <stdio.h>
 
 #include "typedefs.h"
@@ -62,6 +64,8 @@ void setupScene(){
 }
 
 int main(int argc, const char* argv[]){
+    //init rand() number generator
+    srand (static_cast <unsigned> (time(0)));       //used for rand
     setupScene();
     return 0;
 }

@@ -3,6 +3,7 @@
 #define __RAY_H__
 
 #include <vector>
+#include <random>
 
 #include "typedefs.h"
 #include "Object.h"
@@ -37,6 +38,10 @@ class Ray{
         Color           color_;         // RGB vec3
         bool            insideObject_;
         float           russianP_;
+
+        //define random number generator
+        static std::default_random_engine GENERATOR_;
+        static unsigned SEED_;
 };
 
 #endif

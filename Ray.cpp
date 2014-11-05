@@ -1,5 +1,7 @@
 
 #include <algorithm>
+#include <limits>
+#include <chrono>
 
 #include "Ray.h"
 
@@ -7,6 +9,10 @@
 inline bool compareDistance(const distMatPair &firstElem, const distMatPair &secondElem){
     return firstElem.first[3] < secondElem.first[3];
 };
+
+//initialize static random number generator;
+unsigned Ray::SEED_ = std::chrono::system_clock::now().time_since_epoch().count();
+std::default_random_engine Ray::GENERATOR_(Ray::SEED_);
 
 //default Constructor, called when initializing array
 Ray::Ray(){
@@ -44,11 +50,13 @@ Color Ray::computeColor(const Pos3 &camPos, const std::vector<Object*> &obj, con
                 case LAMBERTIAN:
                 {
                     float childImportance = 0.f;
-                    if(NO_MT_CARLO_RAYS != 0){
+                    //if(NO_MT_CARLO_RAYS != 0){
+                    for(unsigned i = 0; i < NO_MT_CARLO_RAYS; ++i){
                         Ray reflectedRay = computeReflectionRay(surfaceNormal, lights, closestIntersection);
-                        childImportance = reflectedRay.importance_/2.f;
+                        reflectedRay.setImportance(reflectedRay.importance_*COLOR_BLEED/NO_MT_CARLO_RAYS);
+                        childImportance += reflectedRay.importance_;
                         if(childImportance > 0.f)
-                            reflectedRayColor = childImportance*reflectedRay.computeColor(camPos, obj, lights, ++iteration);
+                            reflectedRayColor += reflectedRay.computeColor(camPos, obj, lights, ++iteration);
                     }
                     localLighting = (1.f-childImportance)*computeLocalLighting(camPos, obj, lights, closestIntersection);
                     break;
@@ -97,8 +105,7 @@ Color Ray::computeColor(const Pos3 &camPos, const std::vector<Object*> &obj, con
                     break;
                 }
             }
-        } else
-            localLighting = computeLocalLighting(camPos, obj, lights, closestIntersection);
+        } //else localLighting = computeLocalLighting(camPos, obj, lights, closestIntersection);
     }
 
     return importance_*(localLighting + reflectedRayColor + refractedRayColor)/russianP_;
@@ -189,37 +196,35 @@ float Ray::computeBRDF(const Direction &normal, const distMatPair &pointPair, Di
         //random numbers for azimuth and inclination angle
 
         //inclination θ, azimuth φ
-        // u1 = θ, u2 φ
-        float u1 = 0.f, u2 = 0.f;     //random numbers
-        Direction psi(0.f);
-        for(unsigned i = 0; i < NO_MT_CARLO_RAYS; ++i){
-            u1 += static_cast <float> (rand()) / static_cast <float> (RAND_MAX+1);
-            u2 += static_cast <float> (rand()) / static_cast <float> (RAND_MAX+1);
+        // u1 θ, u2 φ
+        double u1 = std::generate_canonical<double, std::numeric_limits<double>::digits>(GENERATOR_);   //generate in the interval[0,1)
+        double u2 = std::generate_canonical<double, std::numeric_limits<double>::digits>(GENERATOR_);   //generate in the interval[0,1)
 
-            //psi with respect to Z axis
-            Direction zRefl(std::sqrt(1.f-u1)*std::cos(2*M_PI*u2),
-                            std::sqrt(1.f-u1)*std::sin(2*M_PI*u2),
-                            std::sqrt(1.f-u1)
-                           );
+        //psi with respect to Z axis
+        Direction zRefl(std::sqrt(1.f-u1)*std::cos(2*M_PI*u2),
+                        std::sqrt(1.f-u1)*std::sin(2*M_PI*u2),
+                        std::sqrt(1.f-u1)
+                       );
 
-            //rotate accordingly to normal
-            Direction t = normal;
+        //rotate accordingly to normal
+        Direction t = normal;
 
-            unsigned pos = 0;
-            float m = t[pos]*t[pos];
-            for(unsigned j = 1; j < 3; ++j){
-                if(m > t[j]*t[j]){
-                    m = t[j]*t[j];
-                    pos = j;
-                }
+        unsigned pos = 0;
+        float m = t[pos]*t[pos];
+        for(unsigned j = 1; j < 3; ++j){
+            if(m > t[j]*t[j]){
+                m = t[j]*t[j];
+                pos = j;
             }
-            t[pos] = 1.f;
-
-            Direction u = glm::normalize(glm::cross(t, normal));
-            Direction v =               (glm::cross(normal, u));
-            glm::mat3 rot(u, v, normal);
-            reflection = (rot*zRefl);
         }
+        t[pos] = 1.f;
+
+        Direction u = glm::normalize(glm::cross(t, normal));
+        Direction v =                glm::cross(normal, u);
+
+        glm::mat3 rot(u, v, normal);
+        reflection = (rot*zRefl);
+
         return std::min(1.f, (pointPair.second.specularAlpha+2.f)/(2.f*NO_MT_CARLO_RAYS) * std::pow(glm::dot(perfectReflection, reflection), pointPair.second.specularAlpha));
     }
     return 1.f;
