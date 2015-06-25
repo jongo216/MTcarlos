@@ -105,7 +105,7 @@ Color Ray::computeColor(const Pos3 &camPos, const std::vector<Object*> &obj, con
                     break;
                 }
             }
-        } //else localLighting = computeLocalLighting(camPos, obj, lights, closestIntersection);
+        }
     }
 
     return importance_*(localLighting + reflectedRayColor + refractedRayColor)/russianP_;

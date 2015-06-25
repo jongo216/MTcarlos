@@ -15,7 +15,7 @@ class Light{
         inline Pos3 getPosition(){ return position_; };
         inline Pos3 getRandomPosition(){
             if(!pointLight_)
-                return area_.getRandomPoint() + area_.getNormal()* 50.f;
+                return area_.getRandomPoint();
             else
                 return position_ + area_.getNormal()* 50.f;
         };

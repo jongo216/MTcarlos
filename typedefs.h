@@ -45,11 +45,11 @@ struct Material{
 };
 
 //config variables
-#define RAY_PER_PIXEL 40
+#define RAY_PER_PIXEL 150
 #define RAY_MAX_BOUNCE 10       //for whitted raytracing
-#define NO_SHADOW_RAYS 10
+#define NO_SHADOW_RAYS 5
 #define NO_MT_CARLO_RAYS 3
-#define COLOR_BLEED 0.7f
+#define COLOR_BLEED 1.0f
 
 #define WINDOW_WIDTH  800
 #define WINDOW_HEIGHT 600

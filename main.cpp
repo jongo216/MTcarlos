@@ -38,13 +38,13 @@ void setupScene(){
     printf("Walls added...\n");
 
 
-    Sphere sphere1(Pos3( 0.f, 100.f, 0.f), 100.f, Material(GLOSSY, WHITE));
-    Sphere sphere2(Pos3(200.f, 100.f, 100.f), 100.f, Material(TRANSPARENT, GREEN+BLUE));
+    Sphere sphere1(Pos3(   0.f, 100.f,-75.f), 100.f, Material(GLOSSY, WHITE));
+    Sphere sphere2(Pos3( 200.f, 100.f, 50.f), 100.f, Material(TRANSPARENT, GREEN+BLUE));
 
     objects.push_back(&sphere1);
     objects.push_back(&sphere2);
 
-    Box box1(150.f, 150.f, 150.f, Pos3(-175.f, 75.f, -175.f), Material(LAMBERTIAN, GREEN+BLUE/*Color(0.5f, 0.5f, 0.5f)*/));
+    Box box1(150.f, 150.f, 150.f, Pos3(-200.f, 125.f, -50.f), Material(LAMBERTIAN, GREEN+BLUE/*Color(0.5f, 0.5f, 0.5f)*/));
     objects.push_back(&box1);
 
     printf("Other objects added...\n");
